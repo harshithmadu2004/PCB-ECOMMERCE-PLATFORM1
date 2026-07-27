@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PCB Admin Panel{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0b0f19;
+            --bg-card: rgba(21, 30, 49, 0.7);
+            --bg-card-hover: rgba(28, 41, 66, 0.9);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-cyan: #06b6d4;
+            --accent-blue: #3b82f6;
+            --accent-emerald: #10b981;
+            --accent-rose: #f43f5e;
+            --accent-amber: #f59e0b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; }
+
+        .navbar {
+            background: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .brand { font-size: 1.25rem; font-weight: 700; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .nav-links { display: flex; gap: 1.5rem; list-style: none; align-items: center; }
+        .nav-links a { color: var(--text-secondary); text-decoration: none; font-weight: 500; transition: all 0.2s; }
+        .nav-links a:hover, .nav-links a.active { color: var(--accent-cyan); }
+        .btn-logout { background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.3); color: var(--accent-rose); padding: 0.4rem 1rem; border-radius: 6px; text-decoration: none; font-size: 0.875rem; }
+
+        .main-container { padding: 2rem; flex: 1; max-width: 1300px; margin: 0 auto; width: 100%; }
+
+        .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; backdrop-filter: blur(8px); margin-bottom: 1.5rem; }
+        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; }
+
+        .stat-card { display: flex; flex-direction: column; gap: 0.5rem; }
+        .stat-label { color: var(--text-secondary); font-size: 0.875rem; }
+        .stat-val { font-size: 1.8rem; font-weight: 700; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { padding: 0.85rem 1rem; text-align: left; border-bottom: 1px solid var(--border-color); }
+        th { color: var(--text-secondary); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        tr:hover { background: var(--bg-card-hover); }
+
+        .badge { padding: 0.25rem 0.6rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; display: inline-block; }
+        .badge-pending { background: rgba(245, 158, 11, 0.2); color: var(--accent-amber); border: 1px solid rgba(245, 158, 11, 0.4); }
+        .badge-approved { background: rgba(16, 185, 129, 0.2); color: var(--accent-emerald); border: 1px solid rgba(16, 185, 129, 0.4); }
+        .badge-rejected { background: rgba(244, 63, 94, 0.2); color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.4); }
+
+        .btn { padding: 0.5rem 1rem; border-radius: 6px; font-weight: 600; border: none; cursor: pointer; transition: 0.2s; text-decoration: none; display: inline-block; font-size: 0.875rem; }
+        .btn-primary { background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue)); color: white; }
+        .btn-success { background: var(--accent-emerald); color: white; }
+        .btn-danger { background: var(--accent-rose); color: white; }
+
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group label { display: block; margin-bottom: 0.4rem; color: var(--text-secondary); font-size: 0.875rem; }
+        .form-control { width: 100%; padding: 0.6rem 0.8rem; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary); font-size: 0.9rem; }
+        .form-control:focus { outline: none; border-color: var(--accent-cyan); }
+
+        .alerts { margin-bottom: 1.5rem; }
+        .alert { padding: 0.8rem 1rem; border-radius: 8px; margin-bottom: 0.5rem; font-size: 0.9rem; }
+        .alert-success { background: rgba(16, 185, 129, 0.2); border: 1px solid var(--accent-emerald); color: #6ee7b7; }
+        .alert-error { background: rgba(244, 63, 94, 0.2); border: 1px solid var(--accent-rose); color: #fca5a5; }
+    </style>
+</head>
+<body>
+    {% if user.is_authenticated %}
+    <nav class="navbar">
+        <div class="brand">⚡ PCB Direct SSR Admin</div>
+        <ul class="nav-links">
+            <li><a href="/admin/dashboard/">Dashboard</a></li>
+            <li><a href="/admin/products/">Products</a></li>
+            <li><a href="/admin/orders/">Orders</a></li>
+            <li><a href="/admin/logout/" class="btn-logout">Logout ({{ user.username }})</a></li>
+        </ul>
+    </nav>
+    {% endif %}
+
+    <div class="main-container">
+        {% if messages %}
+        <div class="alerts">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

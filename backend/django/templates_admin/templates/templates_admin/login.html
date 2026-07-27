@@ -1,0 +1,24 @@
+{% extends 'templates_admin/base.html' %}
+
+{% block title %}Admin Login | PCB Admin{% endblock %}
+
+{% block content %}
+<div style="max-width: 420px; margin: 4rem auto;">
+    <div class="card">
+        <h2 style="margin-bottom: 0.5rem; text-align: center;">Classic Admin Login</h2>
+        <p style="color: var(--text-secondary); text-align: center; margin-bottom: 1.5rem; font-size: 0.875rem;">Django Templates Management Panel</p>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" class="form-control" required placeholder="admin">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" class="form-control" required placeholder="••••••••">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.75rem;">Sign In to Panel</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

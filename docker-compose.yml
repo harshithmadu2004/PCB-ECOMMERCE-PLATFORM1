@@ -1,0 +1,97 @@
+version: '3.8'
+
+services:
+  # 1. MySQL Relational Database (Django)
+  mysql-db:
+    image: mysql:8.0
+    container_name: pcb_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: pcb_db
+      MYSQL_USER: pcb_user
+      MYSQL_PASSWORD: pcb_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  # 2. MongoDB Document Store (FastAPI Cart Microservice)
+  mongodb-db:
+    image: mongo:6.0
+    container_name: pcb_mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  # 3. Django Backend & Templates SSR Admin
+  django-backend:
+    build:
+      context: ./backend/django
+      dockerfile: Dockerfile
+    container_name: pcb_django_backend
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - SECRET_KEY=django-insecure-pcb-ecommerce-platform-secret-key-2026
+      - DEBUG=True
+      - JWT_SECRET_KEY=shared-jwt-secret-key-pcb-ecommerce-2026
+      - MYSQL_HOST=mysql-db
+      - MYSQL_DATABASE=pcb_db
+      - MYSQL_USER=pcb_user
+      - MYSQL_PASSWORD=pcb_password
+      - MYSQL_PORT=3306
+    depends_on:
+      - mysql-db
+
+  # 4. FastAPI Cart & Logging Microservice
+  fastapi-cart:
+    build:
+      context: ./backend/fastapi-cart
+      dockerfile: Dockerfile
+    container_name: pcb_fastapi_cart
+    restart: always
+    ports:
+      - "8001:8001"
+    environment:
+      - MONGO_URI=mongodb://mongodb-db:27017
+      - MONGO_DATABASE=pcb_cart_db
+      - JWT_SECRET_KEY=shared-jwt-secret-key-pcb-ecommerce-2026
+    depends_on:
+      - mongodb-db
+
+  # 5. Next.js Customer Shop Portal
+  nextjs-shop:
+    build:
+      context: ./frontend/nextjs-shop
+      dockerfile: Dockerfile
+    container_name: pcb_nextjs_shop
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_DJANGO_API_URL=http://localhost:8000/api
+      - NEXT_PUBLIC_FASTAPI_CART_URL=http://localhost:8001
+    depends_on:
+      - django-backend
+      - fastapi-cart
+
+  # 6. React.js Admin & Customer Dashboard
+  react-admin:
+    build:
+      context: ./frontend/react-admin
+      dockerfile: Dockerfile
+    container_name: pcb_react_admin
+    restart: always
+    ports:
+      - "5173:80"
+    depends_on:
+      - django-backend
+      - fastapi-cart
+
+volumes:
+  mysql_data:
+  mongo_data:

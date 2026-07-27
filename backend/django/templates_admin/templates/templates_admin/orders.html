@@ -1,0 +1,63 @@
+{% extends 'templates_admin/base.html' %}
+
+{% block title %}Order Management | PCB Admin{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h3 style="margin-bottom: 1rem;">All Customer Orders</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Customer</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Shipping Address</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>#{{ order.id }}</td>
+                <td>
+                    <strong>{{ order.user.username }}</strong><br>
+                    <small style="color: var(--text-secondary);">{{ order.user.email }}</small>
+                </td>
+                <td>${{ order.total_amount }}</td>
+                <td>
+                    <span class="badge badge-{{ order.status|lower }}">{{ order.status }}</span>
+                </td>
+                <td style="max-width: 200px; font-size: 0.85rem; color: var(--text-secondary);">
+                    {{ order.shipping_address|truncatechars:40 }}
+                </td>
+                <td>{{ order.created_at|date:"Y-m-d H:i" }}</td>
+                <td>
+                    {% if order.status == 'PENDING' %}
+                    <div style="display: flex; gap: 0.5rem;">
+                        <form method="POST" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="order_id" value="{{ order.id }}">
+                            <input type="hidden" name="action" value="approve">
+                            <button type="submit" class="btn btn-success" style="padding: 0.3rem 0.6rem; font-size: 0.75rem;">Approve</button>
+                        </form>
+                        <form method="POST" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="order_id" value="{{ order.id }}">
+                            <input type="hidden" name="action" value="reject">
+                            <button type="submit" class="btn btn-danger" style="padding: 0.3rem 0.6rem; font-size: 0.75rem;">Reject</button>
+                        </form>
+                    </div>
+                    {% else %}
+                    <span style="color: var(--text-secondary); font-size: 0.8rem;">Completed</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" style="text-align: center; color: var(--text-secondary);">No orders recorded yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

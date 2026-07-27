@@ -1,0 +1,59 @@
+{% extends 'templates_admin/base.html' %}
+
+{% block title %}Dashboard | PCB Admin{% endblock %}
+
+{% block content %}
+<h2 style="margin-bottom: 1.5rem;">System Overview</h2>
+
+<div class="grid-4" style="margin-bottom: 2rem;">
+    <div class="card stat-card">
+        <span class="stat-label">Total Revenue</span>
+        <span class="stat-val" style="color: var(--accent-emerald);">${{ total_revenue }}</span>
+    </div>
+    <div class="card stat-card">
+        <span class="stat-label">Pending Approval</span>
+        <span class="stat-val" style="color: var(--accent-amber);">{{ pending_orders }}</span>
+    </div>
+    <div class="card stat-card">
+        <span class="stat-label">Total Orders</span>
+        <span class="stat-val">{{ total_orders }}</span>
+    </div>
+    <div class="card stat-card">
+        <span class="stat-label">Catalog Products</span>
+        <span class="stat-val" style="color: var(--accent-cyan);">{{ product_count }}</span>
+    </div>
+</div>
+
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3>Recent Orders</h3>
+        <a href="/admin/orders/" class="btn btn-primary">Manage All Orders</a>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in recent_orders %}
+            <tr>
+                <td>#{{ order.id }}</td>
+                <td>{{ order.user.username }}</td>
+                <td>${{ order.total_amount }}</td>
+                <td>
+                    <span class="badge badge-{{ order.status|lower }}">{{ order.status }}</span>
+                </td>
+                <td>{{ order.created_at|date:"Y-m-d H:i" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" style="text-align: center; color: var(--text-secondary);">No orders recorded yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
